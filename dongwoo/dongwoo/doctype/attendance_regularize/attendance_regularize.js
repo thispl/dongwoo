@@ -119,7 +119,7 @@ frappe.ui.form.on("Attendance Regularize", {
 			const timeDifference = outTimeDate - attendanceDate;
 			const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
 			console.log(daysDifference)
-			if (daysDifference >= 1){
+			if (daysDifference >= 2){
 				frappe.msgprint(__("Kindly check the corrected out time"));
             	frappe.validated = false
 			}

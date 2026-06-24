@@ -19,13 +19,14 @@
   "shift",
   "in_time",
   "out_time",
+  "ot_hours",
   "column_break_mznv",
   "corrected_shift",
   "corrected_in",
   "corrected_out",
+  "corrected_ot",
   "section_break_15",
   "attendance_marked",
-  "amended_from",
   "amended_from"
  ],
  "fields": [
@@ -130,9 +131,8 @@
   },
   {
    "fieldname": "attendance_marked",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Attendance Marked",
-   "options": "Attendance",
    "read_only": 1
   },
   {
@@ -152,12 +152,26 @@
    "options": "Attendance Regularize",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "ot_hours",
+   "fieldtype": "Check",
+   "label": "OT Hours"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.ot_hours==1",
+   "fieldname": "corrected_ot",
+   "fieldtype": "Float",
+   "label": "Corrected OT",
+   "mandatory_depends_on": "eval:doc.ot_hours==1"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-30 13:37:41.327959",
+ "modified": "2025-06-02 11:36:59.899446",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Attendance Regularize",
