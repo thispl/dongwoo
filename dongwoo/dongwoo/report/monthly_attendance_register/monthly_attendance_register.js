@@ -36,6 +36,13 @@ frappe.query_reports["Monthly Attendance Register"] = {
 			"options": "Employee Type",
 		},
 		{
+			"fieldname": "contractor",
+			"label": __("Contractor"),
+			"fieldtype": "Link",
+			"options": "Contractor",
+			"depends_on": "eval:doc.employee_type == 'Contract Employee'"
+		},
+		{
 			"fieldname": "department",
 			"label": __("Department"),
 			"fieldtype": "Link",

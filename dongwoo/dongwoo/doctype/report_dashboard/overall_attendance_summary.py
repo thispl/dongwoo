@@ -41,6 +41,24 @@ def make_xlsx(data, args,sheet_name=None, wb=None, column_widths=None):
 		 
 	ws = wb.create_sheet(sheet_name, 0)
 	ws.column_dimensions['A'].width = 25
+	ws.column_dimensions['B'].width = 10
+	ws.column_dimensions['C'].width = 10
+	ws.column_dimensions['D'].width = 10
+	ws.column_dimensions['E'].width = 10
+	ws.column_dimensions['F'].width = 10
+	ws.column_dimensions['G'].width = 10
+	ws.column_dimensions['H'].width = 10
+	ws.column_dimensions['I'].width = 10
+	ws.column_dimensions['J'].width = 10
+	ws.column_dimensions['K'].width = 10
+	ws.column_dimensions['L'].width = 10
+	ws.column_dimensions['M'].width = 10
+	ws.column_dimensions['N'].width = 10
+	ws.column_dimensions['O'].width = 10
+	ws.column_dimensions['P'].width = 10
+	ws.column_dimensions['Q'].width = 10
+	ws.column_dimensions['R'].width = 10
+	ws.column_dimensions['S'].width = 10
 	ws.append(['DongWoo Surfacetech (India) Pvt Ltd.'])
 	ws.append([''])
 	date1 = datetime.strptime(args['start_date'],'%Y-%m-%d')

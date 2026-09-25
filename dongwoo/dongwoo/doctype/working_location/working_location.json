@@ -20,7 +20,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-07 16:01:07.325737",
+ "modified": "2024-10-26 11:38:16.314572",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Working Location",
@@ -42,5 +42,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

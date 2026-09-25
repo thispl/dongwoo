@@ -45,8 +45,8 @@ def get_columns(filters):
 		_("Employee") + ":Data/:150",
 		_("Employee Name") + ":Data/:200",
 		_("Department") + ":Data/:150",
-		_("DOJ") + ":Date/:100",
 		_("Designation") + ":Data/:150",
+		_("DOJ") + ":Date/:100",
 		_("Employee Type") + ":Data/:150",
 		_("Details") + ":Data/:150",
 	]
@@ -81,7 +81,7 @@ def get_data(filters):
 	employees = get_employees(filters)
 	for emp in employees:
 		dates = get_dates(filters.from_date,filters.to_date)
-		row1 = [emp.name,emp.employee_name,emp.department  or '',emp.date_of_joining  or '',emp.designation or '',emp.employee_type or '',"Scheduled"]
+		row1 = [emp.name,emp.employee_name,emp.department  or '',emp.designation or '',emp.date_of_joining  or '',emp.employee_type or '',"Scheduled"]
 		row2 = ["","","","","","","Actual"]
 		row3 = ["","","","","","","Continue"]
 		
@@ -243,8 +243,8 @@ def get_employees(filters):
 		conditions+="and e.department = '%s' "%(filters.department)
 	if filters.employee_type:
 		conditions+="and employee_type = '%s' "%(filters.employee_type)
-	employees = frappe.db.sql("""select e.* from `tabEmployee` e inner join `tabDepartment` d on e.department = d.name where e.status = 'Active' and d.name != 'All Departments' %s order by d.order_value, e.date_of_joining""" % (conditions), as_dict=True)
-	left_employees = frappe.db.sql("""select e.* from `tabEmployee` e inner join `tabDepartment` d on e.department = d.name where e.status = 'Left' and e.relieving_date >= '%s' and d.name != 'All Departments' %s order by d.order_value, e.date_of_joining""" %(filters.from_date,conditions),as_dict=True)
+	employees = frappe.db.sql("""select e.* from `tabEmployee` e inner join `tabDepartment` d on e.department = d.name inner join `tabDesignation` de on de.name = e.designation where e.status = 'Active' and d.name != 'All Departments' %s order by d.order_value, de.order, e.date_of_joining""" % (conditions), as_dict=True)
+	left_employees = frappe.db.sql("""select e.* from `tabEmployee` e inner join `tabDepartment` d on e.department = d.name inner join `tabDesignation` de on de.name = e.employee where e.status = 'Left' and e.relieving_date >= '%s' and d.name != 'All Departments' %s order by d.order_value, de.order, e.date_of_joining""" %(filters.from_date,conditions),as_dict=True)
 	employees.extend(left_employees)
 	return employees
 

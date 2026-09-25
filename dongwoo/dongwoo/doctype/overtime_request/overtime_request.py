@@ -10,254 +10,330 @@ from frappe.utils import date_diff
 from datetime import datetime, time
 from datetime import date,datetime,timedelta
 import calendar
+from frappe.utils import getdate, add_days, date_diff
+from dongwoo.mark_attendance import check_holiday
+
 from frappe.utils import (
-	add_days,
-	ceil,
-	cint,
-	comma_and,
-	flt,
-	get_link_to_form,
-	getdate,
-	now_datetime,
-	datetime,get_first_day,get_last_day,
-	nowdate,
-	today,
+    add_days,
+    ceil,
+    cint,
+    comma_and,
+    flt,
+    get_link_to_form,
+    getdate,
+    now_datetime,
+    datetime,get_first_day,get_last_day,
+    nowdate,
+    today,
 )
 class OvertimeRequest(Document):
-	def on_submit(self):
-		if self.is_considered_as == 'Compensatory Off':
-			to_date=add_days(self.ot_date,30)
-			employee=frappe.get_all('Employee',{'status':'Active'},['*'])
-			leave_ledger_entries = frappe.get_all(
-					"Leave Ledger Entry",
-					filters={'employee': self.employee, 'leave_type': 'Compensatory Off','docstatus':('!=',2)},
-					fields=["*"],
-					order_by="name DESC, creation DESC",
-					limit_page_length=1
-				)
-			if leave_ledger_entries:
-				latest_leave_entry = leave_ledger_entries[0]
-				employees = frappe.get_all('Overtime Request', {'employee': self.employee}, ['*'])
-				ad = frappe.new_doc('Leave Ledger Entry')
-				ad.employee = self.employee
-				ad.employee_name = self.employee_name
-				ad.from_date = self.ot_date
-				ad.to_date = to_date
-				ad.leave_type='Compensatory Off'
-				ad.transaction_type="Leave Allocation"
-				if self.total_hours >= 8 and self.total_hours < 16:
-					a=latest_leave_entry.leaves
-					b=1
-					c=a+b
-					ad.leaves=c
-				if self.total_hours >= 16:
-					a=latest_leave_entry.leaves
-					b=2
-					c=a+b
-					ad.leaves=c
-				ad.save()
-				ad.submit()
-				frappe.db.commit()
-			else:
-			   
-				employees = frappe.get_all('Overtime Request', {'employee': self.employee}, ['*'])
-				ad = frappe.new_doc('Leave Ledger Entry')
-				ad.employee = self.employee
-				ad.employee_name = self.employee_name
-				ad.from_date = self.ot_date
-				ad.to_date = to_date
-				ad.leave_type='compensatory Off'
-				ad.transaction_type="Leave Allocation"
-				if self.total_hours >= 8 and self.total_hours < 16:
-					ad.leaves=1
-				if self.total_hours >= 16:
-					ad.leaves=2
-				ad.save()
-				ad.submit()
-				frappe.db.commit()
+    # def after_insert(self):
+    #     ret=get_attendance_values(self.employee,self.ot_date)
+    #     if ret!='No':
+    #         frappe.db.set_value("Overtime Request",self.name,'shift',ret['shift'])
+    #         frappe.db.set_value("Overtime Request",self.name,'total_hour',ret['total_working_hours'])
+    def on_cancel(self):
+        if self.is_considered_as=='Compensatory Off':
+            to_date=add_days(self.ot_date,30)
+            to_date=getdate(to_date)
+            leave_allocation  = frappe.db.sql(
+                    """
+                    SELECT
+                        name
+                    FROM `tabLeave Allocation`
+                    WHERE employee=%(employee)s AND leave_type='Compensatory Off'
+                        AND docstatus=1
+                        AND (from_date between %(from_date)s AND %(to_date)s
+                            OR to_date between %(from_date)s AND %(to_date)s
+                            OR (from_date < %(from_date)s AND to_date > %(to_date)s))
+                """,
+                    {"from_date": self.ot_date, "to_date": to_date, "employee": self.employee},
+                    as_dict=1,
+                )
+            if leave_allocation:
+                hh=check_holiday(self.ot_date,self.employee) 
+                if hh:
+                    if self.shift=='C':
+                        if self.total_hours >= 7 and self.total_hours < 14:
+                            leave=1
+                        elif self.total_hours >= 14 and self.total_hours < 21:
+                            leave=2
+                        elif self.total_hours >= 21:
+                            leave=3
+                        else:
+                            leave=0
+                    else:
+                        if self.total_hours >= 8 and self.total_hours < 16:
+                            leave=1
+                        elif self.total_hours >= 16 and self.total_hours < 24:
+                            leave=2
+                        elif self.total_hours >= 24:
+                            leave=3
+                        else:
+                            leave=0
+                else:
+                    if self.shift=='B':
+                        if self.total_hours >= 7 and self.total_hours < 15:
+                            leave=1
+                        elif self.total_hours >= 15 and self.total_hours < 23:
+                            leave=2
+                        elif self.total_hours >= 23:
+                            leave=3
+                        else:
+                            leave=0
+                    else:
+                        if self.total_hours >= 8 and self.total_hours < 16:
+                            leave=1
+                        elif self.total_hours >= 16 and self.total_hours < 24:
+                            leave=2
+                        elif self.total_hours >= 24:
+                            leave=3
+                        else:
+                            leave=0
+                la_name = leave_allocation[0].get('name')
+                la = frappe.get_doc('Leave Allocation',la_name)
+                la.new_leaves_allocated-= leave
+                la.total_leaves_allocated-= leave
+                la.save(ignore_permissions=True)
+                frappe.db.commit()
+                # frappe.db.set_value("Leave Allocation",la_name,'new_leaves_allocated',la.new_leaves_allocated-leave)
+                # frappe.db.set_value("Leave Allocation",la_name,'total_leaves_allocated',la.total_leaves_allocated-leave)
+    def validate(self):
+        if frappe.db.exists("Overtime Request",{'employee':self.employee,'ot_date':self.ot_date,'docstatus':['!=',2],'name':['!=',self.name]}):
+            frappe.throw("Already another request found for the same date")
+        if self.total_hours==0:
+            frappe.throw("Insufficient OT hours to raise request")
+        if self.employee_type=='Worker':
+            gross=frappe.db.get_value('Employee',{'name':self.name},['actual_gross'])
+            if self.is_considered_as=='' or self.is_considered_as=='Overtime':
+                if gross:
+                    self.overtime_amount=(gross/209)*2*self.total_hours
+        if self.docstatus==0:
+            otdate = getdate(self.ot_date)
+            year = otdate.year
+            month = otdate.month
+            total_days_in_month = calendar.monthrange(year, month)[1]
+            if self.employee_type=='Worker':
+                gross=frappe.db.get_value('Employee',{'name':self.employee},['actual_gross'])
+                if self.is_considered_as=='' or self.is_considered_as=='Overtime':
+                    if gross:
+                        self.overtime_amount=(gross/209)*2*self.total_hours
+                
+            if self.employee_type=='Contract Employee':
+                gross=frappe.db.get_value('Employee',{'name':self.employee},['revised_gross'])
+                if self.is_considered_as=='' or self.is_considered_as=='Overtime':
+                    if gross:
+                        self.overtime_amount=(gross/8)*self.total_hours  
+            if self.employee_type=='D . Trainee':
+                gross=frappe.db.get_value('Employee',{'name':self.employee},['actual_gross'])
+                if self.is_considered_as=='' or self.is_considered_as=='Overtime':
+                    if gross:
+                        self.overtime_amount=((gross/total_days_in_month)/8)*2*self.total_hours
 
-		employees = frappe.get_all('Employee', {'status': 'Active'}, ['*'])
-		self.festival_allowance=0
-		for emp in employees:
-			# frappe.errprint('hiii')
-			holi_doc = frappe.get_doc('Holiday List', emp.holiday_list)
-
-			for holiday in holi_doc.holidays:
-				if emp.name==self.employee:
-					# frappe.errprint(holiday.get('holiday_date'))
-					attendance=frappe.get_all('Attendance',{'employee':self.employee,'attendance_date':self.ot_date},['*'])
-					for att in attendance:
-						if att.total_overtime_hours.total_seconds() > 0:
-							self.shift_allowance = att.shift_allowance
-
-							# # Assuming att.total_overtime_hours is a string in the format HH:MM:SS
-							# total_overtime_time = datetime.strptime(att.total_overtime_hours, "%H:%M:%S")
-
-							# # Convert time to timedelta
-							# total_overtime_timedelta = timedelta(hours=total_overtime_time.hour, minutes=total_overtime_time.minute, seconds=total_overtime_time.second)
-
-							# Calculate the total hours, including fractional hours
-							total_hours = att.total_overtime_hours.total_seconds() / 3600
-							frappe.errprint(f"Calculated Total Hours: {total_hours}")
-							frappe.errprint(type(total_hours))
-							self.total_hours = total_hours
-
-							
-						if frappe.db.exists('Overtime Request',{'ot_date':holiday.get('holiday_date')}):
-							if self.employee_type == 'Staff' :
-								# frappe.errprint(int(att.working_hours))
-								# frappe.errprint(int(att.employee))
-								# frappe.errprint('staff')
-								c=int(att.working_hours)*100
-								a=get_first_day(self.ot_date)
-								b=get_last_day(self.ot_date)
-								cal=float((date_diff(b, a))+1)
-								# frappe.errprint(cal)
-								salary=emp.gross_pay
-								# frappe.errprint(salary)
-								amt_1=salary/cal
-								tot=amt_1+c
-								if att.shift=='A':
-									total=tot
-									shift=0
-								if att.shift=='B':
-									if att.working_hours >= 4:
-										total=tot
-										shift=30
-									else:
-										total=tot
-								if att.shift=='C':
-									if att.working_hours >= 4:
-										total=tot
-										shift=50
-										frappe.errprint('a')
-									else:
-										total=tot
-
-								# frappe.errprint(amt_1)
-								self.overtime_amount=tot 
-								self.shift_allowance=shift
-								frappe.db.set_value("Overtime Request",self.name,"overtime_amount",tot) 
-								frappe.db.set_value("Overtime Request",self.name,"shift_allowance",shift) 
-								nf=frappe.get_doc('NH and FH Holidays Salary', 'NH and FH Holidays Salary')
-								for i in nf.trainee_nf_holiday_salary:
-									# frappe.errprint(i.holiday_date) 
-									if self.ot_date == i.holiday_date:
-										if i.festival_allowance=='Pongal' or 'Deepavali':
-											if att.working_hours < 7:
-												self.festival_allowance=500
-
-
-												frappe.db.set_value("Overtime Request",self.name,"festival_allowance",'500') 
-
-											if att.working_hours >=7 :
-												# frappe.errprint(self.ot_date)
-												# frappe.errprint(i.holiday_date)
-
-												self.festival_allowance=1000
-
-										frappe.db.set_value("Overtime Request",self.name,"festival_allowance",1000) 
-										# frappe.errprint('pongaldgfd')
-								if self.ot_date == i.holiday_date :
-									if i.festival_allowance=='Election':
-										if att.working_hours >=7 :
-											self.festival_allowance=400
-
-											frappe.db.set_value("Overtime Request",self.name,"festival_allowance",400) 
-								if self.ot_date == i.holiday_date :
-									if i.festival_allowance=='Other NH/FH Holidays':
-										if att.working_hours >=7 :
-											self.festival_allowance=300
-
-											frappe.db.set_value("Overtime Request",self.name,"festival_allowance",300) 
-
-								self.total_amount=tot+shift+self.festival_allowance
-
-
-
-						if frappe.db.exists('Overtime Request',{'ot_date':holiday.get('holiday_date')}):
-							if self.employee_type=='Worker' or self.employee_type=="Trainee" :
-								# frappe.errprint(int(att.working_hours))
-								# frappe.errprint(int(att.employee))
-								# frappe.errprint('Worker')
-								a=get_first_day(self.ot_date)
-								b=get_last_day(self.ot_date)
-								# frappe.errprint(b)
-								fromdate=a
-								todate=b
-								cal=float((date_diff(b, a))+1)
-								# frappe.errprint(cal)
-								salary=emp.gross_pay
-								# frappe.errprint(salary)
-								amt_1=salary/cal
-								tot=amt_1*2
-								if att.shift=='A':
-									total=tot
-									shift=0
-								if att.shift=='B':
-									if att.working_hours >= 4:
-										total=tot
-										shift=30
-									else:
-										total=tot
-								if att.shift=='C':
-									if att.working_hours >= 4:
-										total=tot
-										shift=50
-										# frappe.errprint('a')
-									else:
-										total=tot                       
-										# frappe.errprint('b')
-								if self.is_considered_as != "Compensatory Off":
-									self.overtime_amount=tot 
-									self.shift_allowance=shift  
-
-									frappe.db.set_value("Overtime Request",self.name,"overtime_amount",tot) 
-									frappe.db.set_value("Overtime Request",self.name,"shift_allowance",shift) 
-								# frappe.errprint(total)
-								nf=frappe.get_doc('NH and FH Holidays Salary', 'NH and FH Holidays Salary')
-								for i in nf.trainee_nf_holiday_salary:
-									# frappe.errprint(i.holiday_date) 
-									if self.ot_date == i.holiday_date and self.is_considered_as != "Compensatory Off":
-										if i.festival_allowance=='Pongal' or 'Deepavali':
-									
-
-											if att.working_hours >=7 :
-												self.festival_allowance=300
-
-												frappe.db.set_value("Overtime Request",self.name,"festival_allowance",300) 
-											# frappe.errprint('pongal')
-								if self.ot_date == i.holiday_date and self.is_considered_as != "Compensatory Off":
-									if i.festival_allowance=='Election':
-										if att.working_hours >=7 :
-											self.festival_allowance=300
-											frappe.db.set_value("Overtime Request",self.name,"festival_allowance",300) 
-								if self.ot_date == i.holiday_date and self.is_considered_as != "Compensatory Off":
-									if i.festival_allowance=='Other NH/FH Holidays':
-										if att.working_hours >=7 :
-											self.festival_allowance=200
-											frappe.db.set_value("Overtime Request",self.name,"festival_allowance",200) 
-
-								self.total_amount=tot+shift+self.festival_allowance
+    def on_submit(self):
+        if self.is_considered_as == 'Compensatory Off':
+            to_date=add_days(self.ot_date,90)
+            to_date=getdate(to_date)
+            employee=frappe.get_all('Employee',{'status':'Active'},['*'])
+            leave_allocation  = frappe.db.sql(
+                """
+                SELECT
+                    name
+                FROM `tabLeave Allocation`
+                WHERE employee=%(employee)s AND leave_type='Compensatory Off'
+                    AND docstatus=1
+                    AND (from_date between %(from_date)s AND %(to_date)s
+                        OR to_date between %(from_date)s AND %(to_date)s
+                        OR (from_date < %(from_date)s AND to_date > %(to_date)s))
+            """,
+                {"from_date": self.ot_date, "to_date": to_date, "employee": self.employee},
+                as_dict=1,
+            )
+            
+            if leave_allocation:
+                hh=check_holiday(self.ot_date,self.employee) 
+                if hh:
+                    if self.shift=='C':
+                        if self.total_hours >= 7 and self.total_hours < 14:
+                            leave=1
+                        elif self.total_hours >= 14 and self.total_hours < 21:
+                            leave=2
+                        elif self.total_hours >= 21:
+                            leave=3
+                        else:
+                            leave=0
+                    else:
+                        if self.total_hours >= 8 and self.total_hours < 16:
+                            leave=1
+                        elif self.total_hours >= 16 and self.total_hours < 24:
+                            leave=2
+                        elif self.total_hours >= 24:
+                            leave=3
+                        else:
+                            leave=0
+                else:
+                    if self.shift=='B':
+                        if self.total_hours >= 7 and self.total_hours < 15:
+                            leave=1
+                        elif self.total_hours >= 15 and self.total_hours < 23:
+                            leave=2
+                        elif self.total_hours >= 23:
+                            leave=3
+                        else:
+                            leave=0
+                    else:
+                        if self.total_hours >= 8 and self.total_hours < 16:
+                            leave=1
+                        elif self.total_hours >= 16 and self.total_hours < 24:
+                            leave=2
+                        elif self.total_hours >= 24:
+                            leave=3
+                        else:
+                            leave=0
 
 
-					
+
+                la_name = leave_allocation[0].get('name')
+                la = frappe.get_doc('Leave Allocation',la_name)
+                if getdate(la.to_date) < to_date:
+                    la.to_date=to_date
+                if getdate(la.from_date) > getdate(self.ot_date):
+                    date_difference = date_diff(self.ot_date,la.from_date)
+                    from_date =self.ot_date
+                    from_date = add_days(from_date,date_difference) 
+                    la.from_date=from_date
+                la.new_leaves_allocated+= leave
+                la.total_leaves_allocated+= leave
+                la.save(ignore_permissions=True)
+                frappe.db.commit()
+            else:
+                hh=check_holiday(self.ot_date,self.employee) 
+                if hh:
+                    if self.shift=='C':
+                        if self.total_hours >= 7 and self.total_hours < 14:
+                            leave=1
+                        elif self.total_hours >= 14 and self.total_hours < 21:
+                            leave=2
+                        elif self.total_hours >= 21:
+                            leave=3
+                        else:
+                            leave=0
+                    else:
+                        if self.total_hours >= 8 and self.total_hours < 16:
+                            leave=1
+                        elif self.total_hours >= 16 and self.total_hours < 24:
+                            leave=2
+                        elif self.total_hours >= 24:
+                            leave=3
+                        else:
+                            leave=0
+                else:
+                    if self.shift=='B':
+                        if self.total_hours >= 7 and self.total_hours < 15:
+                            leave=1
+                        elif self.total_hours >= 15 and self.total_hours < 23:
+                            leave=2
+                        elif self.total_hours >= 23:
+                            leave=3
+                        else:
+                            leave=0
+                    else:
+                        if self.total_hours >= 8 and self.total_hours < 16:
+                            leave=1
+                        elif self.total_hours >= 16 and self.total_hours < 24:
+                            leave=2
+                        elif self.total_hours >= 24:
+                            leave=3
+                        else:
+                            leave=0
+                la=frappe.new_doc('Leave Allocation')
+                la.employee=self.employee
+                la.leave_type='Compensatory Off'
+                la.from_date=self.ot_date
+                la.to_date=to_date
+                la.new_leaves_allocated=leave
+                la.save(ignore_permissions=True)
+                frappe.db.commit()
+                la.submit()
+
+            
+                    
 @frappe.whitelist()
 def get_attendance_values(employee, ot_date):
-	attendance_doc = frappe.get_all('Attendance', 
-		filters={'employee': employee, 'attendance_date': ot_date},
-		fields=['shift', 'out_time', 'total_working_hours', 'overtime_hours']
-	)
-		
+    attendance_doc = frappe.get_all('Attendance', 
+        filters={'employee': employee, 'attendance_date': ot_date},
+        fields=['shift', 'out_time', 'total_working_hours', 'overtime_hours']
+    )
+        
 
-	if attendance_doc:
-		return {
-			'shift': attendance_doc[0]['shift'],
-			'out_time': attendance_doc[0]['out_time'],
-			'total_working_hours': attendance_doc[0]['total_working_hours'],
-			'total_overtime_hours': attendance_doc[0]['overtime_hours']
-		}
-	# frappe.errprint()
-	else:
-		frappe.throw(_('No attendance record found for the specified employee and date.'))
-	
+    if attendance_doc:
+        if attendance_doc and attendance_doc[0]['out_time']:
+            out_time = attendance_doc[0]['out_time']
+            
+            if isinstance(out_time, str):
+                try:
+                    out_time = datetime.strptime(out_time, '%Y-%m-%d %H:%M:%S') 
+                except ValueError:
+                    return {"error": "Invalid datetime format in out_time"}
+
+            out_time_str = out_time.strftime('%H:%M:%S')
+            return {
+                'shift': attendance_doc[0]['shift'],
+                'out_time': out_time_str,
+                'total_working_hours': attendance_doc[0]['total_working_hours'],
+                'total_overtime_hours': attendance_doc[0]['overtime_hours']
+            }
+        else:
+            return 'No'
+    # frappe.errprint()
+    else:
+        frappe.throw(_('No attendance record found for the specified employee and date.'))
+        return 'No'
+    
+@frappe.whitelist()
+def get_start_time(employee, ot_date, shift):
+    hh=check_holiday(ot_date,employee) 
+    if hh:
+        start=frappe.db.get_value("Shift Type",{'name':shift},['start_time'])
+        in_time=frappe.db.get_value("Attendance",{'employee':employee,'attendance_date':ot_date,'docstatus':['!=',2]},['in_time'])
+        if start:
+            if isinstance(start, datetime.timedelta):  # Convert timedelta to time
+                start = (datetime.datetime.min + start).time()
+        if in_time:
+            in_time=in_time.time()
+            if in_time>start:
+                start=in_time
+    else:
+        start=frappe.db.get_value("Shift Type",{'name':shift},['end_time'])
+    return start
+
+@frappe.whitelist()
+def check_for_ot_hrs(employee, ot_date):
+    hh=check_holiday(ot_date,employee) 
+    ot_hrs=frappe.db.get_value('Attendance',{'employee':employee,'attendance_date':ot_date,'docstatus':['!=',2]},['overtime_hours'])
+    shift=frappe.db.get_value('Attendance',{'employee':employee,'attendance_date':ot_date,'docstatus':['!=',2]},['shift'])
+    if shift:
+        if not hh:    
+            if shift=='B':
+                if ot_hrs >= 7:
+                    return "yes"
+                else:
+                    return "no"
+            else:
+                if ot_hrs >= 8:
+                    return "yes"
+                else:
+                    return "no"
+        else:
+            if shift=='C':
+                if ot_hrs>=7:
+                    return 'yes'
+                else:
+                    return 'no'
+            else:
+                if ot_hrs>=8:
+                    return 'yes'
+                else:
+                    return 'no'
+    else:
+        frappe.throw("No shift marked on Attendance")

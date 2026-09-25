@@ -150,7 +150,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-05 11:17:10.261851",
+ "modified": "2024-10-26 11:38:18.903355",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Suggestion Form",
@@ -172,5 +172,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

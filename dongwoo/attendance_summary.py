@@ -925,17 +925,7 @@ def get_data_3(args):
 	status.append(row)
 	return status 
 
-@frappe.whitelist()
-def create_hooks_att3():
-	job = frappe.db.exists('Scheduled Job Type', 'download')
-	if not job:
-		att = frappe.new_doc("Scheduled Job Type")
-		att.update({
-			"method": 'dongwoo.attendance_summary.download',
-			"frequency": 'Cron',
-			"cron_format": "*/5 * * * *"
-		})
-		att.save(ignore_permissions=True)
+
 		
 @frappe.whitelist()
 def send_mail1():
@@ -953,7 +943,7 @@ def send_mail1():
 	subject = f"Attendance Summary {formatted_date}"
 	message = f"Dear Team,<br><br>Kindly find the attached Attendance Summary {formatted_date}."
 	frappe.sendmail(
-		# recipients= ['abdulla.pi@groupteampro.com','dineshbabu.k@groupteampro.com','anil.p@groupteampro.com','gifty.p@groupteampro.com',"venkatrajr@dwsi.co.in","vinothkumar@dwsi.co.in","vishnu@dwsi.co.in","security@dwsi.co.in"],
+		# recipients= ['abdulla.pi@groupteampro.com','dineshbabu.k@groupteampro.com','anil.p@groupteampro.com','gifty.p@groupteampro.com',"vinothkumar@dwsi.co.in","vishnu@dwsi.co.in","security@dwsi.co.in"],
 		recipients= ['gifty.p@groupteampro.com'],
 		subject=subject,
 		attachments=attachments,

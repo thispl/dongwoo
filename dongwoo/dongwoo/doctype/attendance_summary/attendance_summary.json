@@ -9,6 +9,7 @@
  "field_order": [
   "employee",
   "employee_name",
+  "department",
   "user",
   "column_break_3",
   "from_date",
@@ -28,12 +29,14 @@
    "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
+   "ignore_user_permissions": 1,
    "label": "Employee Name"
   },
   {
    "fieldname": "user",
    "fieldtype": "Data",
    "hidden": 1,
+   "ignore_user_permissions": 1,
    "label": "User"
   },
   {
@@ -58,13 +61,21 @@
    "fieldname": "html",
    "fieldtype": "HTML",
    "label": "html"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Department",
+   "options": "Department"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-02-22 11:04:42.943595",
+ "modified": "2025-02-12 12:44:20.139820",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Attendance Summary",
@@ -77,6 +88,17 @@
    "print": 1,
    "read": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "HOD",
+   "select": 1,
    "share": 1,
    "write": 1
   },

@@ -38,7 +38,17 @@ def download():
     filename = 'Attendance Summary {}'.format(formatted_date)
     args = {'start_date':add_days(today(),-1),'end_date':add_days(today(),-1)}
     build_xlsx_response(filename=filename,args=args)
-    
+
+
+@frappe.whitelist()
+def download_att():
+    formatted_date = add_days(today(),-1)
+    date_obj = datetime.strptime(formatted_date, '%Y-%m-%d')
+    formatted_date = date_obj.strftime('%d-%m-%Y')
+    filename = 'Attendance Summary {}'.format(formatted_date)
+    args = {'start_date':add_days(today(),-1),'end_date':add_days(today(),-1)}
+    build_xlsx_response_att(filename=filename,args=args)
+
 def make_xlsx(data,args, sheet_name=None, wb=None, column_widths=None):
     column_widths = column_widths or []
     if wb is None:
@@ -176,6 +186,7 @@ def build_xlsx_response(filename,args):
         'fcontent': xlsx_file.getvalue()
     }]
     formatted_date = add_days(today(),-1)
+    # formatted_date = '2024-10-01'
     date_obj = datetime.strptime(formatted_date, '%Y-%m-%d')
     formatted_date = date_obj.strftime('%d-%m-%Y')
     subject = f"Attendance Summary {formatted_date}"
@@ -183,12 +194,35 @@ def build_xlsx_response(filename,args):
     <b>TEAM HR<br>DongWoo Surfacetech (India) Pvt Ltd.</b><br>"""
 
     frappe.sendmail(
-        recipients= ['pavithra.s@groupteampro.com','abdulla.pi@groupteampro.com','dineshbabu.k@groupteampro.com','anil.p@groupteampro.com','gifty.p@groupteampro.com',"venkatrajr@dwsi.co.in","vinothkumar@dwsi.co.in","vishnu@dwsi.co.in","security@dwsi.co.in",'jeniba.a@groupteampro.com','vishal@dwsi.co.in','info@dwsi.co.in'],
-        # recipients= ['pavithra.s@groupteampro.com'],
+        recipients= ['pavithra.s@groupteampro.com','anil.p@groupteampro.com','gifty.p@groupteampro.com',"vinothkumar@dwsi.co.in","vishnu@dwsi.co.in","security@dwsi.co.in",'jeniba.a@groupteampro.com','vishal@dwsi.co.in','info@dwsi.co.in'],
+        # recipients= ['pavithra.s@groupteampro.com','jenisha.p@groupteampro.com'],
         subject=subject,
         attachments=attachments,
         message=message
     )
+
+def build_xlsx_response_att(filename,args):
+    xlsx_file = make_xlsx(filename, args)
+    attachments = [{
+        'fname': filename + '.xlsx',
+        'fcontent': xlsx_file.getvalue()
+    }]
+    formatted_date = add_days(today(),-1)
+    # formatted_date = '2024-10-01'
+    date_obj = datetime.strptime(formatted_date, '%Y-%m-%d')
+    formatted_date = date_obj.strftime('%d-%m-%Y')
+    subject = f"Attendance Summary {formatted_date}"
+    message = f"""<b>Dear Sir,</b><br><br>Please find the attached Attendance Summary of the date:<b>{formatted_date}.</b><br><br><br>Regards,<br>
+    <b>TEAM HR<br>DongWoo Surfacetech (India) Pvt Ltd.</b><br>"""
+
+    frappe.sendmail(
+        recipients= ['pavithra.s@groupteampro.com','jeniba.a@groupteampro.com','info@dwsi.co.in'],
+        # recipients= ['pavithra.s@groupteampro.com','jenisha.p@groupteampro.com'],
+        subject=subject,
+        attachments=attachments,
+        message=message
+    )
+
 
 @frappe.whitelist()
 def get_title():
@@ -1123,25 +1157,37 @@ def create_background_job_for_attendance_Summary():
     )
 
 @frappe.whitelist()
-def create_attendance_summary():
-    job = frappe.db.exists('Scheduled Job Type', 'attendance_summary')
-    if not job:
-        att = frappe.new_doc("Scheduled Job Type")
-        att.update({
-            "method": 'dongwoo.emaill_alerts1.create_background_job_for_attendance_Summary',
-            "frequency": 'Cron',
-            "cron_format": '*/25 * * * *'
-        })
-        att.save(ignore_permissions=True)
+def create_background_job_for_att_summary():
+    frappe.enqueue(
+        download_att, 
+        queue="long",
+        timeout=36000,
+        is_async=True, 
+        now=False, 
+        job_name='Attendance Summary',
+        enqueue_after_commit=False,
+    ) 
 
 @frappe.whitelist()
-def create_attendance_summary1():
-    job = frappe.db.exists('Scheduled Job Type', 'attendance_summary')
-    if not job:
-        att = frappe.new_doc("Scheduled Job Type")
-        att.update({
-            "method": 'dongwoo.emaill_alerts1.create_background_job_for_attendance_Summary',
-            "frequency": 'Cron',
-            "cron_format": '20 09 * * *'
-        })
-        att.save(ignore_permissions=True)
+def create_background_job_for_att_summary1():
+    frappe.enqueue(
+        download_att, 
+        queue="long",
+        timeout=36000,
+        is_async=True, 
+        now=False, 
+        job_name='Attendance Summary',
+        enqueue_after_commit=False,
+    ) 
+
+@frappe.whitelist()
+def create_hooks_att3():
+	job = frappe.db.exists('Scheduled Job Type', 'Att Summary1')
+	if not job:
+		att = frappe.new_doc("Scheduled Job Type")
+		att.update({
+			"method": 'dongwoo.emaill_alerts1.create_background_job_for_att_summary1',
+			"frequency": 'Cron',
+			"cron_format": "50 09 * * *"
+		})
+		att.save(ignore_permissions=True)

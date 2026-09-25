@@ -49,7 +49,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-14 21:13:22.736758",
+ "modified": "2024-10-26 11:38:19.087256",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Meal Type",
@@ -71,5 +71,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

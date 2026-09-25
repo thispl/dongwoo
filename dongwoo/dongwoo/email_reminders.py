@@ -31,7 +31,7 @@ def send_holidays_reminder_in_advance():
 	email_header = _("Holidays this Week.")
 	frappe.sendmail(
 		# recipients = ['giftyannie6@gmail.com'],
-		recipients = ['vishnu@dwsi.co.in','venkatrajr@dwsi.co.in','vinothkumar@dwsi.co.in','vishal@dwsi.co.in'],
+		recipients = ['vishnu@dwsi.co.in','vinothkumar@dwsi.co.in','vishal@dwsi.co.in'],
 		# recipients = ['jeniba.a@groupteampro.com'],
 		subject=_("Upcoming Holidays Reminder"),
 		template="holiday_reminder",
@@ -54,7 +54,7 @@ def send_birthday_reminders():
 
 	for company, birthday_persons in employees_born_today.items():
 		# recipients = ['giftyannie6@gmail.com','gifty.p@groupteampro.com']
-		recipients = ['vishnu@dwsi.co.in','venkatrajr@dwsi.co.in','vinothkumar@dwsi.co.in','vishal@dwsi.co.in'],
+		recipients = ['vishnu@dwsi.co.in','vinothkumar@dwsi.co.in','vishal@dwsi.co.in'],
 
 		reminder_text, message = get_birthday_reminder_text_and_message(birthday_persons)
 		send_birthday_reminder(reminder_text, birthday_persons, message)
@@ -86,7 +86,7 @@ def get_birthday_reminder_text_and_message(birthday_persons):
 
 def send_birthday_reminder(reminder_text, birthday_persons, message):
 	frappe.sendmail(
-		recipients = ['vishnu@dwsi.co.in','venkatrajr@dwsi.co.in','vinothkumar@dwsi.co.in','vishal@dwsi.co.in'],
+		recipients = ['vishnu@dwsi.co.in','vinothkumar@dwsi.co.in','vishal@dwsi.co.in'],
 		# recipients = ['jeniba.a@groupteampro.com'],
 		# recipients = ['giftyannie6@gmail.com','gifty.p@groupteampro.com'],
 		subject=_("Birthday Reminder"),
@@ -213,7 +213,7 @@ def get_pluralized_years(years):
 
 def send_work_anniversary_reminder(reminder_text, anniversary_persons, message):
 	frappe.sendmail(
-		recipients = ['vishnu@dwsi.co.in','venkatrajr@dwsi.co.in','vinothkumar@dwsi.co.in','vishal@dwsi.co.in'],
+		recipients = ['vishnu@dwsi.co.in','vinothkumar@dwsi.co.in','vishal@dwsi.co.in'],
 		# recipients = ['jeniba.a@groupteampro.com'],
 		subject=_("Work Anniversary Reminder"),
 		template="anniversary_reminder",
@@ -225,35 +225,7 @@ def send_work_anniversary_reminder(reminder_text, anniversary_persons, message):
 		header=_("Work Anniversary Reminder"),
 	)
 
-@frappe.whitelist()
-def birthday_reminder():
-	job = frappe.db.exists('Scheduled Job Type', 'send_birthday_reminders')
-	if not job:
-		att = frappe.new_doc("Scheduled Job Type")
-		att.update({
-			"method": 'dongwoo.dongwoo.email_reminders.send_birthday_reminders',
-			"frequency": 'Daily',
-		})
-		att.save(ignore_permissions=True)
 
-@frappe.whitelist()
-def work_anniversary():
-	job = frappe.db.exists('Scheduled Job Type', 'send_work_anniversary_reminders')
-	if not job:
-		att = frappe.new_doc("Scheduled Job Type")
-		att.update({
-			"method": 'dongwoo.dongwoo.email_reminders.send_work_anniversary_reminders',
-			"frequency": 'Daily',
-		})
-		att.save(ignore_permissions=True)
 
-@frappe.whitelist()
-def holiday():
-	job = frappe.db.exists('Scheduled Job Type', 'send_holidays_reminder_in_advance')
-	if not job:
-		att = frappe.new_doc("Scheduled Job Type")
-		att.update({
-			"method": 'dongwoo.dongwoo.email_reminders.send_holidays_reminder_in_advance',
-			"frequency": 'Weekly'
-		})
-		att.save(ignore_permissions=True)
+
+

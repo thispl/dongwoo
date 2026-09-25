@@ -69,7 +69,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-24 16:02:58.024500",
+ "modified": "2024-10-26 11:38:18.384554",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Upload Work Spot for CL",
@@ -89,5 +89,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

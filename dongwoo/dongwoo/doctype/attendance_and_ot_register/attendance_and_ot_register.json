@@ -128,7 +128,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-09-01 12:17:00.994117",
+ "modified": "2024-10-26 11:38:15.502874",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Attendance and OT Register",
@@ -150,5 +150,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

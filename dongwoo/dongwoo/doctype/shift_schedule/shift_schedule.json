@@ -76,7 +76,8 @@
   },
   {
    "fieldname": "column_break_10",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "mandatory_depends_on": "eval:!(doc.is__local)"
   },
   {
    "fieldname": "amended_from",
@@ -100,7 +101,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-06-28 10:25:20.303157",
+ "modified": "2024-10-26 11:38:21.154212",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Shift Schedule",
@@ -122,5 +123,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

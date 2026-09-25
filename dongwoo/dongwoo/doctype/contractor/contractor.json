@@ -10,7 +10,13 @@
  "engine": "InnoDB",
  "field_order": [
   "contractor",
-  "contractor_full_name"
+  "contractor_full_name",
+  "service_charges",
+  "shoe_amount",
+  "column_break_3ruof",
+  "from_date",
+  "to_date",
+  "minimum_wages"
  ],
  "fields": [
   {
@@ -23,12 +29,40 @@
    "fieldname": "contractor_full_name",
    "fieldtype": "Data",
    "label": "Contractor Full Name"
+  },
+  {
+   "fieldname": "column_break_3ruof",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  },
+  {
+   "fieldname": "minimum_wages",
+   "fieldtype": "Currency",
+   "label": "Minimum Wages"
+  },
+  {
+   "fieldname": "service_charges",
+   "fieldtype": "Float",
+   "label": "Service Charges"
+  },
+  {
+   "fieldname": "shoe_amount",
+   "fieldtype": "Currency",
+   "label": "Shoe Amount"
   }
  ],
- "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-24 14:00:54.056075",
+ "modified": "2025-12-24 16:40:22.615850",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Contractor",

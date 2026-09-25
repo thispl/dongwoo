@@ -218,7 +218,7 @@ def build_xlsx_response(filename, args):
 	message = f"Dear Team,<br><br>Kindly find the attached Manpower Report {shift} Shift - {date1}."
 
 	frappe.sendmail(
-		# recipients= ['veeramayandi.p@groupteampro.com',"venkatrajr@dwsi.co.in","vinothkumar@dwsi.co.in","vishnu@dwsi.co.in","security@dwsi.co.in"],
+		# recipients= ['veeramayandi.p@groupteampro.com',"vinothkumar@dwsi.co.in","vishnu@dwsi.co.in","security@dwsi.co.in"],
 		recipients= ['veeramayandi.p@groupteampro.com'],
 		subject=subject,
 		attachments=attachments,
@@ -1181,38 +1181,5 @@ def get_data_3(args):
 	status.append(row)		
 	return status
 
-@frappe.whitelist()
-def create_hooks_att1():
-	job = frappe.db.exists('Scheduled Job Type', 'send_today_canteen1')
-	if not job:
-		att = frappe.new_doc("Scheduled Job Type")
-		att.update({
-			"method": 'dongwoo.email_alerts.send_today_canteen1',
-			"frequency": 'Cron',
-			"cron_format": "00 09 * * * *"
-		})
-		att.save(ignore_permissions=True)
 
-@frappe.whitelist()
-def create_hooks_att2():
-	job = frappe.db.exists('Scheduled Job Type', 'send_today_canteen2')
-	if not job:
-		att = frappe.new_doc("Scheduled Job Type")
-		att.update({
-			"method": 'dongwoo.email_alerts.send_today_canteen2',
-			"frequency": 'Cron',
-			"cron_format": "30 17 * * * *"
-		})
-		att.save(ignore_permissions=True)
 
-@frappe.whitelist()
-def create_hooks_att3():
-	job = frappe.db.exists('Scheduled Job Type', 'send_today_canteen3')
-	if not job:
-		att = frappe.new_doc("Scheduled Job Type")
-		att.update({
-			"method": 'dongwoo.email_alerts.send_today_canteen3',
-			"frequency": 'Cron',
-			"cron_format": "00 02 * * * *"
-		})
-		att.save(ignore_permissions=True)

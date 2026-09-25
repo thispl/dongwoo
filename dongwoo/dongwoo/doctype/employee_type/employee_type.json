@@ -33,7 +33,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-30 17:37:42.927210",
+ "modified": "2024-10-26 11:38:17.325136",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Employee Type",
@@ -55,5 +55,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

@@ -55,10 +55,15 @@ app_license = "MIT"
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-#	"methods": "dongwoo.utils.jinja_methods",
-#	"filters": "dongwoo.utils.jinja_filters"
-# }
+jinja = {
+	"methods": [
+        # "dongwoo.dongwoo.doctype.report_dashboard.monthly_salary_report.format_currency",
+        "dongwoo.leave_all_custom.get_total_leaves_allocated",
+        "dongwoo.leave_all_custom.get_approved_leave_days",
+        "dongwoo.leave_all_custom.get_balance_leaves",
+        "dongwoo.leave_all_custom.count_holidays",
+	]
+}
 
 # Installation
 # ------------
@@ -96,8 +101,13 @@ app_license = "MIT"
 
 override_doctype_class = {
 	"Salary Slip": "dongwoo.dongwoo.overrides.CustomSalarySlip",
-    "Shift Assignment": "dongwoo.dongwoo.overrides.CustomShiftAssignment"
+    # "Shift Assignment": "dongwoo.dongwoo.overrides.CustomShiftAssignment"
 }
+
+override_whitelisted_methods = {
+    "hrms.hr.page.organizational_chart.organizational_chart.get_children": "dongwoo.dongwoo.overrides.get_children"
+}
+
 
 # Document Events
 # ---------------
@@ -105,18 +115,27 @@ override_doctype_class = {
 
 doc_events = {
     "Employee":{
-		"validate": ["dongwoo.custom.inactive_employee","dongwoo.custom.emp_type_order"]
-        # "before_rename":"dongwoo.custom.before_rename"
+        "after_insert": "dongwoo.employee_custom.create_salary_structure_assignment",
+		"validate": ["dongwoo.employee_custom.inactive_employee","dongwoo.employee_custom.emp_type_order"],
+        "before_insert": "dongwoo.employee_custom.check_hra",
+        "before_save": "dongwoo.employee_custom.check_hra"
 	},
-    "Attendance":{
-		"on_submit": ["dongwoo.custom.ot_request_creation"]
+    # "Attendance":{
+		# "on_submit": ["dongwoo.custom.ot_request_creation",],
+        # 'validate':"dongwoo.custom.update_od",
         # "before_rename":"dongwoo.custom.before_rename"
-	},
+	# },
     "Permission":{
 		"on_submit": ["dongwoo.dongwoo.doctype.permission.permission.att_permission_update"],
-        "on_cancel" : ["dongwoo.dongwoo.doctype.permission.permission .att_permission_cancel"]
+        "on_cancel" : ["dongwoo.dongwoo.doctype.permission.permission.att_permission_cancel"]
         # "before_rename":"dongwoo.custom.before_rename"
 	},
+    'Scheduled Job Log':{
+       "validate":"dongwoo.mail_alert_custom.schedule_log_fail" 
+	},
+    'Leave Application':{
+        "validate":['dongwoo.leave_application_custom.restrict_leave','dongwoo.leave_application_custom.restrict_leave_cl']
+    },
 
 }
 
@@ -148,7 +167,18 @@ scheduler_events = {
             'dongwoo.emaill_alerts1.download',
             # 'dongwoo.emaill_alerts1.create_background_job_for_attendance_Summary'
 		],
-        "20 09 * * *":'dongwoo.emaill_alerts1.create_background_job_for_attendance_Summary'
+        "20 09 * * *":'dongwoo.emaill_alerts1.create_background_job_for_attendance_Summary',
+        "40 09 * * *":'dongwoo.mail_alert_custom.create_off',
+        # "50 09 * * *":'dongwoo.custom.create_off1',
+        "0 10 * * *" :[
+			'dongwoo.mail_alert_custom.overtime_approver_hr',
+            'dongwoo.mail_alert_custom.permission_approvers',
+            'dongwoo.mail_alert_custom.permission_approver_hr',
+            'dongwoo.mail_alert_custom.onduty_approvers',
+            'dongwoo.mail_alert_custom.onduty_approver_hr',
+            'dongwoo.mail_alert_custom.leave_approvers',
+            
+		],
 	}
 }
 

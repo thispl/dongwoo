@@ -14,5 +14,46 @@ frappe.ui.form.on('Permission', {
 			
 		})	
 	},
+	permission_from_time(frm){
+		if (frm.doc.permission_to_time && frm.doc.permission_from_time){
+			frappe.call({
+				"method": "dongwoo.per_custom.calculate_flexible_time",
+				"args":{
+					"fdate" : frm.doc.permission_from_time,
+					"tdate" : frm.doc.permission_to_time,
+					"perm" : frm.doc.permission_date
+				},
+				callback(r){
+					if(r.message){
+						frm.set_value('total_time',r.message)
+					}
+				}
+			})
+		}
+	},
+	permission_to_time(frm){
+		if (frm.doc.permission_to_time && frm.doc.permission_from_time && frm.doc.permission_date){
+			frappe.call({
+				"method": "dongwoo.per_custom.calculate_flexible_time",
+				"args":{
+					"fdate" : frm.doc.permission_from_time,
+					"tdate" : frm.doc.permission_to_time,
+					"perm" : frm.doc.permission_date,
+					'name' :frm.doc.name				
+				},
+				callback: function(r) {
+					if (r.message == 0) {
+						frm.set_value('total_time', 0);
+					} else {
+						frm.set_value('total_time', r.message);
+					}
+				}
+				
+			})
+		}
+	}
+		
 						
 });
+
+

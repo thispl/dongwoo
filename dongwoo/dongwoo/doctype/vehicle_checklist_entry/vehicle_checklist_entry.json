@@ -56,7 +56,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-06 20:44:32.178557",
+ "modified": "2024-10-26 11:38:19.303731",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Vehicle Checklist Entry",
@@ -78,5 +78,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

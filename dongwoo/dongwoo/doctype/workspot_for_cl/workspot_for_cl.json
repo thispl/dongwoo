@@ -92,7 +92,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-27 15:32:10.232932",
+ "modified": "2024-10-26 11:38:17.118881",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Workspot for CL",
@@ -114,5 +114,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

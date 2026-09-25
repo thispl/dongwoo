@@ -9,10 +9,12 @@
  "engine": "InnoDB",
  "field_order": [
   "employee",
+  "coff_applicable",
   "employee_name",
   "employment_type",
   "department",
   "employee_type",
+  "attendance",
   "column_break_7",
   "designation",
   "work_spot",
@@ -20,12 +22,14 @@
   "working_location",
   "section_break_9vc2v",
   "ot_date",
+  "posting_date",
   "shift",
   "column_break_5oy2b",
   "from_time",
   "to_time",
   "section_break_14",
   "total_hour",
+  "overtime_amount",
   "total_hours",
   "ot_approver",
   "approvers_section",
@@ -45,7 +49,6 @@
   "compensatory_off_and_overtime_section",
   "is_considered_as",
   "overtime_allowance",
-  "overtime_amount",
   "total_amount",
   "column_break_l8uwa",
   "shift_allowance",
@@ -56,6 +59,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "in_standard_filter": 1,
    "label": "Employee",
    "options": "Employee",
    "reqd": 1
@@ -116,6 +120,8 @@
    "allow_on_submit": 1,
    "fieldname": "ot_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": " OT  Date",
    "reqd": 1
   },
@@ -126,6 +132,7 @@
    "options": "Shift Type"
   },
   {
+   "default": "00:00:00",
    "depends_on": "shift",
    "fieldname": "from_time",
    "fieldtype": "Time",
@@ -133,6 +140,7 @@
    "read_only": 1
   },
   {
+   "default": "00:00:00",
    "depends_on": "shift",
    "fieldname": "to_time",
    "fieldtype": "Time",
@@ -162,9 +170,15 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
+   "fetch_from": "attendance.overtime_hours",
+   "fetch_if_empty": 1,
    "fieldname": "total_hours",
    "fieldtype": "Float",
-   "label": "OT Hours"
+   "in_list_view": 1,
+   "label": "OT Hours",
+   "permlevel": 1,
+   "read_only_depends_on": "eval:frappe.get_roles != \"HR Manager\""
   },
   {
    "fieldname": "employment_type",
@@ -174,10 +188,15 @@
    "read_only": 1
   },
   {
+   "default": "00:00:00",
+   "fetch_from": "attendance.total_working_hours",
+   "fetch_if_empty": 1,
    "fieldname": "total_hour",
    "fieldtype": "Time",
+   "in_list_view": 1,
    "label": "Total Hour",
-   "read_only": 1
+   "read_only": 1,
+   "read_only_depends_on": "eval:frappe.get_roles != \"HR Manager\"\r\n"
   },
   {
    "collapsible": 1,
@@ -270,26 +289,32 @@
    "read_only": 1
   },
   {
+   "depends_on": "eval:doc.coff_applicable==1",
    "fieldname": "compensatory_off_and_overtime_section",
    "fieldtype": "Section Break",
-   "hidden": 1,
    "label": "Compensatory Off And Overtime"
   },
   {
+   "depends_on": "eval:doc.coff_applicable==1",
    "fieldname": "is_considered_as",
    "fieldtype": "Select",
    "label": "Is Considered as",
+   "mandatory_depends_on": "eval:doc.coff_applicable==1",
    "options": "\nOvertime\nCompensatory Off"
   },
   {
    "fieldname": "overtime_allowance",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Overtime Allowance"
   },
   {
+   "depends_on": "eval:doc.employee_type=='Worker' || doc.employee_type=='Contract Employee' || doc.employee_type=='D . Trainee' && doc.overtime_amount>0",
    "fieldname": "overtime_amount",
    "fieldtype": "Currency",
-   "label": "Overtime Amount"
+   "in_list_view": 1,
+   "label": "Overtime Amount",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_l8uwa",
@@ -324,57 +349,39 @@
    "default": "0",
    "fetch_from": "employee.total_number_of_approvers",
    "fieldname": "total_number_of_approvers",
-   "fieldtype": "Data",
-   "label": "Total Number of Approvers",
+   "fieldtype": "Int",
+   "label": "Total Number of Approvers"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "attendance",
+   "fieldtype": "Link",
+   "label": "Attendance",
+   "options": "Attendance",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "coff_applicable",
+   "fieldtype": "Check",
+   "label": "Coff Applicable"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-06-07 10:33:42.632207",
+ "modified": "2025-03-11 18:57:18.695143",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Overtime Request",
  "naming_rule": "Expression (old style)",
  "owner": "Administrator",
- "permissions": [
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Employee",
-   "share": 1
-  },
-  {
-   "amend": 1,
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR User",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  }
- ],
+ "permissions": [],
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

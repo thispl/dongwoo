@@ -9,29 +9,108 @@
  "field_order": [
   "date",
   "column_break_ndmzx",
-  "process_checkin"
+  "process_checkin",
+  "section_break_ujxdo",
+  "from_date",
+  "to_date",
+  "employee",
+  "employee_type",
+  "contractor_name",
+  "column_break_qfnao",
+  "process_sa",
+  "process_att",
+  "process_sp_all",
+  "process_ur"
  ],
  "fields": [
   {
    "fieldname": "date",
    "fieldtype": "Date",
+   "hidden": 1,
    "label": "Date"
   },
   {
    "fieldname": "column_break_ndmzx",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "hidden": 1
   },
   {
    "fieldname": "process_checkin",
    "fieldtype": "Button",
+   "hidden": 1,
    "label": "Process Checkin"
+  },
+  {
+   "depends_on": "eval:doc.from_date && doc.to_date && ((doc.employee_type =='Worker' || doc.employee_type =='D . Trainee' || doc.employee_type =='NAPS' || doc.employee_type =='GET') || doc.employee)",
+   "fieldname": "process_sa",
+   "fieldtype": "Button",
+   "label": "Process Shift Allowance"
+  },
+  {
+   "fieldname": "section_break_ujxdo",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fieldname": "column_break_qfnao",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  },
+  {
+   "depends_on": "eval:doc.from_date && doc.to_date",
+   "fieldname": "process_att",
+   "fieldtype": "Button",
+   "label": "Process Attendance"
+  },
+  {
+   "depends_on": "eval:doc.from_date && doc.to_date",
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "read_only_depends_on": "eval:doc.employee_type"
+  },
+  {
+   "depends_on": "eval:doc.from_date && doc.to_date && (doc.employee_type =='Staff' || !doc.employee_type)",
+   "fieldname": "process_sp_all",
+   "fieldtype": "Button",
+   "label": "Process Special Allowance"
+  },
+  {
+   "depends_on": "eval:doc.from_date && doc.to_date",
+   "fieldname": "process_ur",
+   "fieldtype": "Button",
+   "label": "Process Unregistered Checkin"
+  },
+  {
+   "depends_on": "eval:doc.from_date && doc.to_date",
+   "fieldname": "employee_type",
+   "fieldtype": "Link",
+   "label": "Employee Type",
+   "options": "Employee Type",
+   "read_only_depends_on": "eval:doc.employee"
+  },
+  {
+   "depends_on": "eval:doc.employee_type == \"Contract Employee\"",
+   "fieldname": "contractor_name",
+   "fieldtype": "Link",
+   "label": "Contractor Name",
+   "options": "Contractor"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-07-19 19:27:24.495754",
+ "modified": "2026-09-18 10:23:12.448817",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Attendance Settings",

@@ -4,7 +4,7 @@
 frappe.ui.form.on('Payroll Process', {
 	late_in_and_early_out_process(frm){
 		frappe.call({
-			"method": "dongwoo.custom.attendance_calc",
+			"method": "dongwoo.payroll_custom.attendance_calc",
 			"args":{
 				"from_date" : frm.doc.from_date,
 				"to_date" : frm.doc.to_date,

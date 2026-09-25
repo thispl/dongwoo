@@ -16,6 +16,7 @@
   "column_break_kiej3",
   "hi",
   "employee_type",
+  "device_id",
   "work_location",
   "company",
   "grade",
@@ -75,7 +76,8 @@
    "read_only": 1
   },
   {
-   "fetch_from": "employee.work_spot",
+   "fetch_from": "employee.company",
+   "fetch_if_empty": 1,
    "fieldname": "company",
    "fieldtype": "Data",
    "label": "Work Spot",
@@ -113,11 +115,16 @@
    "fieldname": "date",
    "fieldtype": "Date",
    "label": "Date"
+  },
+  {
+   "fieldname": "device_id",
+   "fieldtype": "Data",
+   "label": "Device id"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-27 12:55:19.409803",
+ "modified": "2024-11-15 15:44:44.842099",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "Canteen Checkin",
@@ -139,5 +146,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

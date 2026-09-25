@@ -1,0 +1,497 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "ORG-.######",
+ "creation": "2024-12-09 11:23:19.483831",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "employee_type",
+  "department",
+  "section_break_0mafh",
+  "probation_planned",
+  "probation_approved",
+  "confirmation_planned",
+  "confirmation_approved",
+  "profile_tab",
+  "qualifications_section",
+  "educational_qualifications",
+  "additional_qualifications",
+  "certification_course",
+  "previous_work_experience_section",
+  "previous_work_experience",
+  "history_of_company_section",
+  "rewards_and_recognition",
+  "department_change_section",
+  "department_change",
+  "designation_change_section",
+  "designation_change",
+  "disciplinary_action_section",
+  "disciplinary_action",
+  "employee_education_section",
+  "employee_education",
+  "employee_external_work_history_section",
+  "employee_external_work_history",
+  "employee_internal_work_history_section",
+  "employee_internal_work_history",
+  "leave_details_section",
+  "leave_details",
+  "section_break_e34ee",
+  "salary_gross",
+  "section_break_lozmp",
+  "family_detail",
+  "section_break_ultwu",
+  "reason_for_cl",
+  "column_break_oz1ej",
+  "reason_for_el",
+  "column_break_zseah",
+  "reason_for_sl",
+  "performance_tab",
+  "performance_appraisal_section",
+  "p1",
+  "p2",
+  "p3",
+  "p4",
+  "p5",
+  "p6",
+  "p7",
+  "column_break_tpwf0",
+  "p8",
+  "p9",
+  "p10",
+  "p11",
+  "p12",
+  "p13",
+  "p14",
+  "weighted_average_section",
+  "p15",
+  "p16",
+  "p17",
+  "p18",
+  "p19",
+  "p20",
+  "p21",
+  "column_break_frk8t",
+  "p22",
+  "p23",
+  "p24",
+  "p25",
+  "p26",
+  "p27"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "unique": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fetch_from": "employee.employee_type",
+   "fetch_if_empty": 1,
+   "fieldname": "employee_type",
+   "fieldtype": "Link",
+   "label": "Employee Type",
+   "options": "Employee Type"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "section_break_0mafh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "probation_planned",
+   "fieldtype": "Date",
+   "label": "Probation Planned"
+  },
+  {
+   "fieldname": "probation_approved",
+   "fieldtype": "Date",
+   "label": "Probation Approved"
+  },
+  {
+   "fieldname": "confirmation_planned",
+   "fieldtype": "Date",
+   "label": "Confirmation Planned "
+  },
+  {
+   "fieldname": "confirmation_approved",
+   "fieldtype": "Date",
+   "label": "Confirmation Approved"
+  },
+  {
+   "fieldname": "profile_tab",
+   "fieldtype": "Tab Break",
+   "label": "Profile"
+  },
+  {
+   "fieldname": "qualifications_section",
+   "fieldtype": "Section Break",
+   "label": "Qualifications"
+  },
+  {
+   "fieldname": "educational_qualifications",
+   "fieldtype": "Table",
+   "label": "Educational Qualifications",
+   "options": "Education"
+  },
+  {
+   "fieldname": "additional_qualifications",
+   "fieldtype": "Table",
+   "label": "Additional Qualifications",
+   "options": "Education"
+  },
+  {
+   "fieldname": "certification_course",
+   "fieldtype": "Table",
+   "label": "Certification Course",
+   "options": "Certificate Education"
+  },
+  {
+   "fieldname": "previous_work_experience_section",
+   "fieldtype": "Section Break",
+   "label": "Previous Work Experience  "
+  },
+  {
+   "fieldname": "previous_work_experience",
+   "fieldtype": "Table",
+   "label": "Previous Work Experience",
+   "options": "Previous Work Experience"
+  },
+  {
+   "fieldname": "history_of_company_section",
+   "fieldtype": "Section Break",
+   "label": "History Of Company "
+  },
+  {
+   "fieldname": "rewards_and_recognition",
+   "fieldtype": "Table",
+   "label": "Rewards And Recognition",
+   "options": "Rewards And Recognition"
+  },
+  {
+   "fieldname": "department_change_section",
+   "fieldtype": "Section Break",
+   "label": "Department Change"
+  },
+  {
+   "fieldname": "designation_change_section",
+   "fieldtype": "Section Break",
+   "label": "Designation Change"
+  },
+  {
+   "fieldname": "designation_change",
+   "fieldtype": "Table",
+   "label": "Designation Change",
+   "options": "Designation Change"
+  },
+  {
+   "fieldname": "disciplinary_action_section",
+   "fieldtype": "Section Break",
+   "label": "Disciplinary Action"
+  },
+  {
+   "fieldname": "disciplinary_action",
+   "fieldtype": "Table",
+   "label": "Disciplinary Action",
+   "options": "Disciplinary Action"
+  },
+  {
+   "fieldname": "employee_education_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Education"
+  },
+  {
+   "fieldname": "employee_education",
+   "fieldtype": "Table",
+   "label": "Employee Education",
+   "options": "Employee Education"
+  },
+  {
+   "fieldname": "employee_external_work_history_section",
+   "fieldtype": "Section Break",
+   "label": "Employee External Work History"
+  },
+  {
+   "fieldname": "employee_external_work_history",
+   "fieldtype": "Table",
+   "label": "Employee External Work History",
+   "options": "Employee External Work History"
+  },
+  {
+   "fieldname": "employee_internal_work_history_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Internal Work History"
+  },
+  {
+   "fieldname": "employee_internal_work_history",
+   "fieldtype": "Table",
+   "label": "Employee Internal Work History",
+   "options": "Employee Internal Work History"
+  },
+  {
+   "fieldname": "performance_tab",
+   "fieldtype": "Tab Break",
+   "label": "Performance"
+  },
+  {
+   "fieldname": "performance_appraisal_section",
+   "fieldtype": "Section Break",
+   "label": "Performance Appraisal"
+  },
+  {
+   "fieldname": "p1",
+   "fieldtype": "Data",
+   "label": "No. of Evaluator"
+  },
+  {
+   "fieldname": "p2",
+   "fieldtype": "Data",
+   "label": "Jr.Engg"
+  },
+  {
+   "fieldname": "p3",
+   "fieldtype": "Data",
+   "label": "Engg."
+  },
+  {
+   "fieldname": "p4",
+   "fieldtype": "Data",
+   "label": "Engg."
+  },
+  {
+   "fieldname": "p5",
+   "fieldtype": "Data",
+   "label": "Sr. Engg."
+  },
+  {
+   "fieldname": "p6",
+   "fieldtype": "Data",
+   "label": "Sr. Engg."
+  },
+  {
+   "fieldname": "column_break_tpwf0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "p7",
+   "fieldtype": "Data",
+   "label": "Asst. Manager"
+  },
+  {
+   "fieldname": "p8",
+   "fieldtype": "Data",
+   "label": "Asst. Manager"
+  },
+  {
+   "fieldname": "p9",
+   "fieldtype": "Data",
+   "label": "Dy. Manager"
+  },
+  {
+   "fieldname": "p10",
+   "fieldtype": "Data",
+   "label": "Manager"
+  },
+  {
+   "fieldname": "p11",
+   "fieldtype": "Data",
+   "label": "Sr. Manager"
+  },
+  {
+   "fieldname": "p12",
+   "fieldtype": "Data",
+   "label": "AGM"
+  },
+  {
+   "fieldname": "p13",
+   "fieldtype": "Data",
+   "label": "AVERAGE SCORE"
+  },
+  {
+   "fieldname": "p14",
+   "fieldtype": "Data",
+   "label": "Other comments and  Remarks"
+  },
+  {
+   "fieldname": "weighted_average_section",
+   "fieldtype": "Section Break",
+   "label": "Weighted Average"
+  },
+  {
+   "fieldname": "p15",
+   "fieldtype": "Data",
+   "label": "No. of Evaluator"
+  },
+  {
+   "fieldname": "p16",
+   "fieldtype": "Data",
+   "label": "Jr.Engg"
+  },
+  {
+   "fieldname": "p17",
+   "fieldtype": "Data",
+   "label": "Engg."
+  },
+  {
+   "fieldname": "p18",
+   "fieldtype": "Data",
+   "label": "Engg."
+  },
+  {
+   "fieldname": "p19",
+   "fieldtype": "Data",
+   "label": "Sr. Engg."
+  },
+  {
+   "fieldname": "p20",
+   "fieldtype": "Data",
+   "label": "Sr. Engg."
+  },
+  {
+   "fieldname": "p21",
+   "fieldtype": "Data",
+   "label": "Asst. Manager"
+  },
+  {
+   "fieldname": "column_break_frk8t",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "p22",
+   "fieldtype": "Data",
+   "label": "Asst. Manager "
+  },
+  {
+   "fieldname": "p23",
+   "fieldtype": "Data",
+   "label": "Dy. Manager"
+  },
+  {
+   "fieldname": "p24",
+   "fieldtype": "Data",
+   "label": "Manager"
+  },
+  {
+   "fieldname": "p26",
+   "fieldtype": "Data",
+   "label": "AGM"
+  },
+  {
+   "fieldname": "p27",
+   "fieldtype": "Data",
+   "label": "AVERAGE SCORE"
+  },
+  {
+   "fieldname": "p25",
+   "fieldtype": "Data",
+   "label": "Sr. Manager"
+  },
+  {
+   "fieldname": "leave_details_section",
+   "fieldtype": "Section Break",
+   "label": "Leave Details"
+  },
+  {
+   "fieldname": "leave_details",
+   "fieldtype": "Table",
+   "label": "Leave Details",
+   "options": "Leave Details"
+  },
+  {
+   "fieldname": "reason_for_cl",
+   "fieldtype": "Small Text",
+   "label": "Reason for CL"
+  },
+  {
+   "fieldname": "column_break_oz1ej",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reason_for_el",
+   "fieldtype": "Small Text",
+   "label": "Reason for EL"
+  },
+  {
+   "fieldname": "column_break_zseah",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reason_for_sl",
+   "fieldtype": "Small Text",
+   "label": "Reason for SL"
+  },
+  {
+   "fieldname": "section_break_e34ee",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "salary_gross",
+   "fieldtype": "Table",
+   "label": "Salary Gross",
+   "options": "Salary Gross"
+  },
+  {
+   "fieldname": "section_break_lozmp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "family_detail",
+   "fieldtype": "Table",
+   "label": "Family Detail",
+   "options": "Family Detail"
+  },
+  {
+   "fieldname": "section_break_ultwu",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "department_change",
+   "fieldtype": "Table",
+   "label": "Department Change",
+   "options": "Department Change"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-12-27 19:30:35.550609",
+ "modified_by": "Administrator",
+ "module": "DONGWOO",
+ "name": "Organization Chart",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

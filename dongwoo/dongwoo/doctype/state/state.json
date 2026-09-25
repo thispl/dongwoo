@@ -20,7 +20,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-05-11 15:46:55.622241",
+ "modified": "2024-10-26 11:38:17.726333",
  "modified_by": "Administrator",
  "module": "DONGWOO",
  "name": "State",
@@ -42,5 +42,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

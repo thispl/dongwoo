@@ -57,7 +57,8 @@ def send_mail_with_attachment(filename, file_content):
     message = "Dear Sir/Madam,<br> Please find attached Report.<br>Thanks & Regards,<br>TEAM ERP<br>This email has been automatically generated. Please do not reply"
     attachments = [{"fname": filename + '.xlsx', "fcontent": file_content}]
     frappe.sendmail(
-		recipients= ['pavithra.s@groupteampro.com',"venkatrajr@dwsi.co.in",'vishal@dwsi.co.in',"vinothkumar@dwsi.co.in","vishnu@dwsi.co.in","security@dwsi.co.in"],
+		recipients= ['pavithra.s@groupteampro.com','sarath.v@groupteampro.com','jeniba.a@groupteampro.com','vishal@dwsi.co.in',"vinothkumar@dwsi.co.in","vishnu@dwsi.co.in","security@dwsi.co.in"],
+        # recipients= ['jeniba.a@groupteampro.com'],
         sender=None,  
         subject=subject,
         message=message,
@@ -80,6 +81,7 @@ def make_xlsx(filename, sheet_name=None, wb=None, column_widths=None):
     start_date = end_date - timedelta(days=7)  
     start_date_str = start_date.strftime('%Y-%m-%d')
     end_date_str = (end_date - timedelta(days=1)).strftime('%Y-%m-%d')  
+    print()
     header_title = f"Weekly Attendance Report ({start_date_str} - {end_date_str})"
     merged_cell = ws.cell(row=1, column=1, value=header_title)
     merged_cell.font = Font(bold=True)
@@ -102,16 +104,17 @@ def make_xlsx(filename, sheet_name=None, wb=None, column_widths=None):
     for i in dept:
         si_no += 1
         if i=='PMT':
-            shift_count = frappe.db.count("Shift Assignment", {"department": ["in", ['D.PMT','H.PMT']],"start_date": ["between", [start_date_str, end_date_str]],"docstatus": ("!=", 2)})
-            att_count = frappe.db.count("Attendance", {"department": ["in", ['D.PMT','H.PMT']],"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","docstatus": ("!=", 2)})
-            ot_count = frappe.db.count("Attendance", {"department": ["in", ['D.PMT','H.PMT']],"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","overtime_hours": [">=", '8'], "docstatus": ("!=", 2)})
+            shift_count = frappe.db.count("Shift Assignment", {"department": ["in", ['D.PMT','H.PMT']],"employee_type":['!=',"Staff"],"start_date": ["between", [start_date_str, end_date_str]],"docstatus": ("!=", 2)})
+            att_count = frappe.db.count("Attendance", {"department": ["in", ['D.PMT','H.PMT']],"employee_type":['!=',"Staff"],"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","docstatus": ("!=", 2)})
+            ot_count = frappe.db.count("Attendance", {"department": ["in", ['D.PMT','H.PMT']],"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","employee_type":'Contract Employee',"overtime_hours": [">=", '8'], "docstatus": ("!=", 2)})
+            ot_shortage = frappe.db.count("Attendance", {"department": ["in", ['D.PMT','H.PMT']],"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","employee_type":['not in',('Staff','Contract Employee')],"overtime_hours": [">=", '8'], "docstatus": ("!=", 2)})
         else:
-            shift_count = frappe.db.count("Shift Assignment", {"department":  i,"start_date": ["between", [start_date_str, end_date_str]],"docstatus": ("!=", 2)})
-            att_count = frappe.db.count("Attendance", {"department": i,"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","docstatus": ("!=", 2)})
-            ot_count = frappe.db.count("Attendance", {"department":  i,"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","overtime_hours": [">=", '8'], "docstatus": ("!=", 2)})
-        
+            shift_count = frappe.db.count("Shift Assignment", {"department":  i,"start_date": ["between", [start_date_str, end_date_str]],"employee_type":['!=',"Staff"],"docstatus": ("!=", 2)})
+            att_count = frappe.db.count("Attendance", {"department": i,"employee_type":['!=',"Staff"],"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","docstatus": ("!=", 2)})
+            ot_count = frappe.db.count("Attendance", {"department":  i,"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","employee_type":'Contract Employee',"overtime_hours": [">=", '8'], "docstatus": ("!=", 2)})
+            ot_shortage = frappe.db.count("Attendance", {"department":  i,"attendance_date": ["between", [start_date_str, end_date_str]],"status": "Present","employee_type":['not in',('Staff','Contract Employee')],"overtime_hours": [">=", '8'], "docstatus": ("!=", 2)})
         shortage = shift_count-att_count
-        ot_shortage = shortage-ot_count
+        # ot_shortage = shortage-ot_count
         data_rows.append([si_no, i, shift_count, att_count, shortage, ot_count, ot_shortage])
     for row in data_rows:
         ws.append(row)
@@ -134,13 +137,3 @@ def make_xlsx(filename, sheet_name=None, wb=None, column_widths=None):
     xlsx_file.seek(0) 
     return xlsx_file
 
-def shift_plan_count():
-    job = frappe.db.exists('Scheduled Job Type', 'shift_plan_excel')
-    if not job:
-        var = frappe.new_doc("Scheduled Job Type")
-        var.update({
-            "method": 'dongwoo.dongwoo.doctype.shift_schedule.shift_plan.shift_plan_excel',
-            "frequency": 'Cron',
-            "cron_format": '30 11 * * 2'
-        })
-        var.save(ignore_permissions=True) 

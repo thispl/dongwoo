@@ -78,77 +78,48 @@ class AttendanceRegularize(Document):
         if not att_name:
             return
 
+        # Build a single update dict to minimize database lock time
+        update_values = {
+            "regularize_marked": 1,
+            "attendance_regularize": self.name,
+        }
+
         if self.corrected_shift:
-            frappe.db.set_value(
-                "Attendance",
-                att_name,
-                "shift",
-                self.corrected_shift,
-                update_modified=False
-            )
-
+            update_values["shift"] = self.corrected_shift
         if self.corrected_in:
-            frappe.db.set_value(
-                "Attendance",
-                att_name,
-                "in_time",
-                self.corrected_in,
-                update_modified=False
-            )
-
+            update_values["in_time"] = self.corrected_in
         if self.corrected_out:
-            frappe.db.set_value(
-                "Attendance",
-                att_name,
-                "out_time",
-                self.corrected_out,
-                update_modified=False
-            )
-
+            update_values["out_time"] = self.corrected_out
         if self.corrected_ot:
-            frappe.db.set_value(
-                "Attendance",
-                att_name,
-                "overtime_hours",
-                self.corrected_ot,
-                update_modified=False
-            )
+            update_values["overtime_hours"] = self.corrected_ot
 
-        frappe.db.set_value(
-            "Attendance",
-            att_name,
-            {
-                "regularize_marked": 1,
-                "attendance_regularize": self.name
-            },
-            update_modified=False
-        )         
+        frappe.db.set_value("Attendance", att_name, update_values, update_modified=False)
 
                 
     def on_cancel(self):
         att = frappe.db.exists('Attendance',{'employee':self.employee,'attendance_date':self.attendance_date,'docstatus':["!=",2]})
-        if att:	
+        if att:
             att_reg = frappe.db.get_value('Attendance',{'name':att},['attendance_regularize'])
             if att_reg == self.name:
-                frappe.db.set_value('Attendance', att, 'attendance_regularize', '')
-                frappe.db.set_value('Attendance', att, 'total_working_hours',"00:00:00")
-                frappe.db.set_value('Attendance', att, 'working_hours',"0.0")
-                frappe.db.set_value('Attendance', att, 'extra_hours',"0.0")
-                frappe.db.set_value('Attendance', att, 'total_extra_hours',"00:00:00")
-                frappe.db.set_value('Attendance', att, 'total_overtime_hours',"00:00:00")
-                frappe.db.set_value('Attendance', att, 'overtime_hours',"0.0")
-                frappe.db.set_value('Attendance', att, 'shift', '')
-                frappe.db.set_value('Attendance', att, 'in_time',None)
-                frappe.db.set_value('Attendance', att, 'out_time',None)
-                # frappe.db.set_value('Attendance', att, 'attendance_regularize', '')
-                frappe.db.set_value('Attendance', att, 'late_entry', 0)
-                frappe.db.set_value('Attendance', att, 'late_entry_time', "00:00:00")
-                frappe.db.set_value('Attendance', att, 'regularize_marked', 0)
-                frappe.db.set_value('Attendance', att, 'early_exit', 0)
-                frappe.db.set_value('Attendance', att, 'status', 'Absent')
-                frappe.db.set_value('Attendance', att, 'early_out_time',  "00:00:00")
-                next_date=add_days(self.attendance_date,1)
-                # mark_att_with_employee(self.attendance_date,next_date,self.employee)
+                update_values = {
+                    'attendance_regularize': '',
+                    'total_working_hours': "00:00:00",
+                    'working_hours': "0.0",
+                    'extra_hours': "0.0",
+                    'total_extra_hours': "00:00:00",
+                    'total_overtime_hours': "00:00:00",
+                    'overtime_hours': "0.0",
+                    'shift': '',
+                    'in_time': None,
+                    'out_time': None,
+                    'late_entry': 0,
+                    'late_entry_time': "00:00:00",
+                    'regularize_marked': 0,
+                    'early_exit': 0,
+                    'status': 'Absent',
+                    'early_out_time': "00:00:00",
+                }
+                frappe.db.set_value('Attendance', att, update_values, update_modified=False)
 
 @frappe.whitelist()
 def get_assigned_shift_details(emp,att_date):
